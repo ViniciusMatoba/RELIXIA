@@ -83,6 +83,12 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
 
   // ─── PRELOAD ─────────────────────────────────────────────────────────────
   function preload() {
+    // Escuta erros de carregamento e exibe no console e via toast
+    this.load.on('loaderror', (file) => {
+      console.error('[Phaser Load Error]', file.key, file.url);
+      showToast(`Erro ao carregar asset: ${file.key} (${file.url})`, 'error');
+    });
+
     // Sprites dos personagens
     Object.entries(MANIFEST.sprites).forEach(([key, def]) => {
       this.load.spritesheet(key, def.file, {
@@ -121,41 +127,33 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       });
     });
 
-    // Fundo sempre desenhado — parallax se carregou, senão gradiente
-    const groundY = H - 40;
-    let usedParallax = false;
+    const groundY = H - 60;
+
+    // ── Fundo: gradiente sempre desenhado primeiro (camada 0) ──
+    const g = this.add.graphics().setDepth(0);
+    g.fillGradientStyle(0x050210, 0x050210, 0x1a0a38, 0x1a0a38, 1);
+    g.fillRect(0, 0, W, H);
+
+    // ── Parallax por cima se os assets carregaram (camada 1) ──
     if (spriteConfig?.parallax) {
       spriteConfig.parallax.forEach(bg => {
         if (!this.textures.exists(bg.key)) return;
-        try {
-          const tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0);
-          tile.setScrollFactor(0);
-          bgs.push({ tile, speed: bg.speed });
-          usedParallax = true;
-        } catch (_) {}
+        const tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0).setDepth(1);
+        bgs.push({ tile, speed: bg.speed });
       });
     }
-    if (!usedParallax) {
-      // Fallback degradê sempre visível
-      const g = this.add.graphics();
-      g.fillGradientStyle(0x120a28, 0x120a28, 0x2a1a50, 0x2a1a50, 1);
-      g.fillRect(0, 0, W, H);
-    }
 
-    // Chão
-    const groundLine = this.add.rectangle(W / 2, groundY + 20, W, 40, 0x1a0f30);
+    // ── Chão ──
+    this.add.rectangle(W / 2, groundY + 30, W, 60, 0x0d0820).setDepth(2);
 
-    // Todos os heróis da dungeon sempre disponíveis para teste
-    const heroY = groundY - 24;
-    const allLeafHeroes = Object.keys(LEAF_HERO_DATA);
-
-    // Espaçamento horizontal dinâmico para não sobrepor
-    const heroSpacing = Math.min(90, Math.floor((W * 0.45) / allLeafHeroes.length));
-    allLeafHeroes.forEach((id, i) => {
+    // Todos os heróis espaçados no terço esquerdo da tela
+    const heroY = groundY;          // pés no chão
+    const heroStartX = 60;
+    const heroGap    = 100;
+    Object.keys(LEAF_HERO_DATA).forEach((id, i) => {
       const hd = LEAF_HERO_DATA[id];
       if (!hd) return;
-      const x = 50 + i * heroSpacing;
-      spawnHero.call(this, hd, x, heroY);
+      spawnHero.call(this, hd, heroStartX + i * heroGap, heroY);
     });
 
     // HUD textos
@@ -174,7 +172,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     // Spawn
     spawnTimer -= dt;
     if (spawnTimer <= 0) {
-      spawnEnemy.call(this, W, H - 64);
+      spawnEnemy.call(this, W);
       spawnTimer = Math.max(0.8, 2.5 - killCount * 0.015);
     }
 
@@ -273,18 +271,23 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(2.5).setDepth(5);
+        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(2).setDepth(5);
         sprite.play(`${spriteKey}-idle`);
       } catch (_) { sprite = null; }
     }
     if (!sprite) {
-      sprite = this.add.rectangle(x, y, 36, 48, HERO_COLORS[spriteKey] || 0x7e57c2).setOrigin(0.5, 1).setDepth(5);
+      sprite = this.add.rectangle(x, y, 36, 64, HERO_COLORS[spriteKey] || 0x7e57c2).setOrigin(0.5, 1).setDepth(5);
     }
 
-    // Barra HP
-    const hpBg  = this.add.rectangle(x, y + 6, 40, 5, 0x222222).setDepth(6);
-    const hpBar = this.add.rectangle(x, y + 6, 40, 5, 0x66bb6a).setOrigin(0, 0.5).setDepth(7);
-    hpBar.setX(x - 20);
+    // Barra HP acima do herói
+    const barY  = y - 100;
+    const hpBg  = this.add.rectangle(x, barY, 44, 6, 0x111111).setDepth(8);
+    const hpBar = this.add.rectangle(x - 22, barY, 44, 6, 0x44ee66).setOrigin(0, 0.5).setDepth(9);
+
+    // Label do nome
+    this.add.text(x, barY - 10, (hd.name || id).split(' ')[0], {
+      fontSize: '9px', color: '#e1dbec', fontFamily: 'Outfit'
+    }).setOrigin(0.5, 1).setDepth(9);
 
     heroes.push({
       id: hd.id,
@@ -299,7 +302,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     });
   }
 
-  function spawnEnemy(x, y) {
+  function spawnEnemy(x) {
     const tier    = dungeon.tier;
     const isBoss  = killCount > 0 && killCount % 20 === 0;
     const spriteConf = spriteConfig || {};
@@ -309,26 +312,29 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     const hp  = (isBoss ? 80 : 20) + killCount * 2 + tier * 10;
     const atk = 3 + Math.floor(killCount * 0.1) + tier;
 
+    const ey = H - 60;   // pés no mesmo chão
+
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, y, enemyKey).setOrigin(0.5, 1).setScale(isBoss ? 3 : 2.5).setFlipX(true).setDepth(5);
+        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(isBoss ? 2.5 : 2).setFlipX(true).setDepth(5);
         sprite.play(`${enemyKey}-walk`);
       } catch (_) { sprite = null; }
     }
     if (!sprite) {
-      sprite = this.add.rectangle(x, y, isBoss ? 52 : 36, isBoss ? 64 : 48, isBoss ? 0xcc0000 : 0x664444).setOrigin(0.5, 1).setDepth(5);
+      sprite = this.add.rectangle(x, ey, isBoss ? 48 : 32, isBoss ? 64 : 48, isBoss ? 0xcc0000 : 0x664444).setOrigin(0.5, 1).setDepth(5);
     }
 
-    const label = this.add.text(x, y - (isBoss ? 80 : 60), isBoss ? `💀 ${dungeon.boss}` : dungeon.enemies[0],
-      { fontSize: isBoss ? '10px' : '8px', color: isBoss ? '#ff4444' : '#ffaaaa', fontFamily: 'Outfit' }).setOrigin(0.5).setDepth(6);
+    const barY  = ey - 90;
+    const label = this.add.text(x, barY - 10, isBoss ? `💀 ${dungeon.boss}` : dungeon.enemies[0],
+      { fontSize: isBoss ? '10px' : '8px', color: isBoss ? '#ff4444' : '#ffaaaa', fontFamily: 'Outfit' }).setOrigin(0.5, 1).setDepth(9);
 
-    const hpBg  = this.add.rectangle(x, y + 8, isBoss ? 52 : 36, 5, 0x222222).setDepth(6);
-    const hpBar = this.add.rectangle(x - (isBoss ? 26 : 18), y + 8, isBoss ? 52 : 36, 5, 0xff4444).setOrigin(0, 0.5).setDepth(7);
+    const hpBg  = this.add.rectangle(x, barY, isBoss ? 52 : 36, 6, 0x111111).setDepth(8);
+    const hpBar = this.add.rectangle(x - (isBoss ? 26 : 18), barY, isBoss ? 52 : 36, 6, 0xff3333).setOrigin(0, 0.5).setDepth(9);
 
     enemies.push({
       sprite, nameTag: label, hpBg, hpBar,
-      x, y,
+      x, y: ey,
       hp, maxHp: hp,
       atk,
       alive: true,
