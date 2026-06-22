@@ -26,13 +26,14 @@
 }
 
 body {
-  background: #030206; /* Fundo escuro fora do container do celular */
+  background: #030206;
   color: var(--text);
   font-family: var(--font-sans);
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
@@ -40,7 +41,8 @@ body {
 #app {
   width: 100%;
   height: 100vh;
-  max-width: 480px; /* Tamanho padrão de tela de smartphone */
+  height: 100dvh;
+  max-width: 480px;
   margin: 0 auto;
   position: relative;
   background: var(--bg-dark);
@@ -59,8 +61,8 @@ body {
 }
 
 /* ===== SCREENS ===== */
-.screen { display: none; min-height: 100%; flex: 1; }
-.screen.active { display: flex; flex-direction: column; flex: 1; }
+.screen { display: none; }
+.screen.active { display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden; }
 
 /* ===== HUB TOPBAR ===== */
 .hub-topbar {
