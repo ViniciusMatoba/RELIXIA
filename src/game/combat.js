@@ -15,9 +15,9 @@ const DUNGEON_SPRITES = {
     enemies: ['nukenin'],
     boss:    'zabuza',
     parallax: [
-      { key: 'bg-sky',    file: 'assets/backgrounds/leaf_sky.png?v=2',    speed: 0.1 },
-      { key: 'bg-mid',    file: 'assets/backgrounds/leaf_mid.png?v=2',    speed: 0.3 },
-      { key: 'bg-ground', file: 'assets/backgrounds/leaf_ground.png?v=2', speed: 0.6 },
+      { key: 'bg-sky',    file: 'assets/backgrounds/leaf_sky.png?v=3',    speed: 0.1 },
+      { key: 'bg-mid',    file: 'assets/backgrounds/leaf_mid.png?v=3',    speed: 0.3 },
+      { key: 'bg-ground', file: 'assets/backgrounds/leaf_ground.png?v=3', speed: 0.6 },
     ],
   },
 };
@@ -205,7 +205,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       e.x -= e.speed * delta;
       if (e.sprite) {
         e.sprite.x = e.x;
-        if (e.sprite.setFlipX) e.sprite.setFlipX(true);
+        if (e.sprite.setFlipX) e.sprite.setFlipX(false);
       }
       if (e.nameTag) e.nameTag.x = e.x;
       updateEntityHP(e);
@@ -299,8 +299,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setDepth(5);
-        sprite.play(`${spriteKey}-idle`);
+        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setFlipX(true).setDepth(5);
+        try { sprite.play(`${spriteKey}-idle`); } catch(e) { console.warn('anim idle falhou', spriteKey, e); }
       } catch (_) { sprite = null; }
     }
     if (!sprite) {
@@ -346,8 +346,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(true).setDepth(5);
-        sprite.play(`${enemyKey}-walk`);
+        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(false).setDepth(5);
+        try { sprite.play(`${enemyKey}-walk`); } catch(e) { console.warn('anim walk falhou', enemyKey, e); }
       } catch (_) { sprite = null; }
     }
     if (!sprite) {
