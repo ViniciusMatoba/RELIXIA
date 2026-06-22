@@ -62,7 +62,7 @@ async function processAlpha(buffer, width, height, tolerance = 45, feather = 25)
 export async function compileGeekSprite(inputPath, outputPath, options = {}) {
   const tolerance = options.tolerance ?? 115;
   const feather = options.feather ?? 15;
-  const fitSize = options.fitSize ?? 38; // Encolhe levemente para não encostar nas bordas (48px)
+  const fitSize = options.fitSize ?? 44; // Encolhe levemente para não encostar nas bordas (48px)
 
   if (!fs.existsSync(inputPath)) {
     throw new Error(`Imagem de entrada não encontrada: ${inputPath}`);
@@ -89,7 +89,7 @@ export async function compileGeekSprite(inputPath, outputPath, options = {}) {
   const isGrid = meta.width === 1024 && meta.height === 1024;
   const cellW = isGrid ? 256 : Math.floor(meta.width / TOTAL_FRAMES);
   const cellH = isGrid ? 256 : meta.height;
-  const borderOffset = isGrid ? 16 : 0;
+  const borderOffset = isGrid ? 8 : 0;
 
   console.log(`[Geek Compiler] Fatiando ${TOTAL_FRAMES} frames (tipo: ${isGrid ? 'Grade 3x4' : 'Tira Linear'}, célula: ${cellW}x${cellH}px, borda: ${borderOffset}px)...`);
 
