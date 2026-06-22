@@ -4,83 +4,83 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>RELIXIA — Heróis Sem Carteira Assinada</title>
-  <script type="module" crossorigin src="/RELIXIA/assets/index-BlYnR_4C.js"></script>
-  <link rel="stylesheet" crossorigin href="/RELIXIA/assets/index-DRcUevrz.css">
+  <script type="module" crossorigin src="/RELIXIA/assets/index-DdE7Q2dk.js"></script>
+  <link rel="stylesheet" crossorigin href="/RELIXIA/assets/index-CMG6lEX_.css">
 </head>
 <body>
   <div id="app">
 
-    <!-- HUB DA CIDADE -->
-    <div id="hub-screen" class="screen active">
-
-      <!-- Recursos no topo -->
-      <div class="hub-topbar">
-        <div class="hub-top-brand">⚔️ RELIXIA</div>
-        <div class="hub-top-resources">
-          <span class="top-res">💰 <strong id="res-gold">0</strong></span>
-          <span class="top-res">👥 <strong id="res-heroes">0</strong></span>
-          <span class="top-res">⚗️ <strong id="res-mats">0</strong></span>
-        </div>
+    <!-- ══ HEADER GLOBAL — fixo em todas as telas ══ -->
+    <header class="global-header">
+      <div class="hub-top-brand">⚔️ RELIXIA</div>
+      <div class="hub-top-resources">
+        <span class="top-res">💰 <strong id="res-gold">0</strong></span>
+        <span class="top-res">👥 <strong id="res-heroes">0</strong></span>
+        <span class="top-res">⚗️ <strong id="res-mats">0</strong></span>
       </div>
+      <button class="btn-force-reload" onclick="forceReload()" title="Forçar atualização">🔄</button>
+    </header>
 
-      <!-- Área central — fundo do hub -->
-      <div class="hub-center">
-        <!-- Botão force reload dentro do centro para não ocupar slot do grid -->
-        <button class="btn-force-reload" onclick="forceReload()" title="Forçar atualização">🔄</button>
+    <!-- ══ CONTEÚDO CENTRAL — alterna entre hub e combate ══ -->
+    <main class="global-content">
 
-        <div class="hub-title-block">
-          <h1 class="hub-main-title">RELIXIA</h1>
-          <p class="hub-main-sub">Heróis Sem Carteira Assinada</p>
-        </div>
-        <div class="hub-status-card">
-          <div class="hub-status-row">
-            <span class="hub-status-label">Masmorra ativa</span>
-            <span class="hub-status-value" id="active-dungeon-name">Vila da Folha</span>
+      <!-- TELA: HUB -->
+      <div id="hub-screen" class="screen active">
+        <div class="hub-center">
+          <div class="hub-title-block">
+            <h1 class="hub-main-title">RELIXIA</h1>
+            <p class="hub-main-sub">Heróis Sem Carteira Assinada</p>
           </div>
-          <div class="hub-status-row">
-            <span class="hub-status-label">Total de kills</span>
-            <span class="hub-status-value" id="total-kills">0</span>
+          <div class="hub-status-card">
+            <div class="hub-status-row">
+              <span class="hub-status-label">Masmorra ativa</span>
+              <span class="hub-status-value" id="active-dungeon-name">Vila da Folha</span>
+            </div>
+            <div class="hub-status-row">
+              <span class="hub-status-label">Total de kills</span>
+              <span class="hub-status-value" id="total-kills">0</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Barra de menu inferior -->
-      <nav class="hub-navbar">
-        <button class="nav-btn" onclick="openModal('modal-dungeon')">
-          <span class="nav-icon">🌀</span>
-          <span class="nav-label">Masmorras</span>
-        </button>
-        <button class="nav-btn" onclick="openModal('modal-tavern')">
-          <span class="nav-icon">🍺</span>
-          <span class="nav-label">Taverna</span>
-        </button>
-        <button class="nav-btn nav-btn-center" onclick="openModal('modal-dungeon')">
-          <span class="nav-icon-center">⚔️</span>
-        </button>
-        <button class="nav-btn" onclick="openModal('modal-forge')">
-          <span class="nav-icon">🔨</span>
-          <span class="nav-label">Forja</span>
-        </button>
-        <button class="nav-btn" onclick="openModal('modal-sanctuary')">
-          <span class="nav-icon">✨</span>
-          <span class="nav-label">Santuário</span>
-        </button>
-      </nav>
-
-    </div>
-
-    <!-- TELA DE COMBATE -->
-    <div id="combat-screen" class="screen">
-      <div class="combat-header">
-        <button class="btn-back" id="btn-back-hub">← Voltar</button>
-        <span id="combat-dungeon-name">Vila da Folha</span>
-        <span>Kills: <strong id="combat-kills">0</strong></span>
+      <!-- TELA: COMBATE -->
+      <div id="combat-screen" class="screen">
+        <div class="combat-header">
+          <button class="btn-back" id="btn-back-hub">← Voltar</button>
+          <span id="combat-dungeon-name">Vila da Folha</span>
+          <span>Kills: <strong id="combat-kills">0</strong></span>
+        </div>
+        <div id="phaser-container"></div>
+        <div class="combat-heroes-strip" id="heroes-status"></div>
       </div>
-      <div id="phaser-container"></div>
-      <div class="combat-footer" id="heroes-status"></div>
-    </div>
 
-    <!-- MODAL: PORTAL DE MASMORRAS -->
+    </main>
+
+    <!-- ══ FOOTER GLOBAL — fixo em todas as telas ══ -->
+    <footer class="global-footer">
+      <button class="nav-btn" onclick="openModal('modal-dungeon')">
+        <span class="nav-icon">🌀</span>
+        <span class="nav-label">Masmorras</span>
+      </button>
+      <button class="nav-btn" onclick="openModal('modal-tavern')">
+        <span class="nav-icon">🍺</span>
+        <span class="nav-label">Taverna</span>
+      </button>
+      <button class="nav-btn nav-btn-center" onclick="openModal('modal-dungeon')">
+        <span class="nav-icon-center">⚔️</span>
+      </button>
+      <button class="nav-btn" onclick="openModal('modal-forge')">
+        <span class="nav-icon">🔨</span>
+        <span class="nav-label">Forja</span>
+      </button>
+      <button class="nav-btn" onclick="openModal('modal-sanctuary')">
+        <span class="nav-icon">✨</span>
+        <span class="nav-label">Santuário</span>
+      </button>
+    </footer>
+
+    <!-- ══ MODAIS ══ -->
     <div id="modal-dungeon" class="modal-overlay" onclick="closeModalOutside(event,'modal-dungeon')">
       <div class="modal">
         <div class="modal-header">
@@ -91,7 +91,6 @@
       </div>
     </div>
 
-    <!-- MODAL: TAVERNA -->
     <div id="modal-tavern" class="modal-overlay" onclick="closeModalOutside(event,'modal-tavern')">
       <div class="modal">
         <div class="modal-header">
@@ -102,7 +101,6 @@
       </div>
     </div>
 
-    <!-- MODAL: FORJA -->
     <div id="modal-forge" class="modal-overlay" onclick="closeModalOutside(event,'modal-forge')">
       <div class="modal">
         <div class="modal-header">
@@ -113,7 +111,6 @@
       </div>
     </div>
 
-    <!-- MODAL: SANTUÁRIO -->
     <div id="modal-sanctuary" class="modal-overlay" onclick="closeModalOutside(event,'modal-sanctuary')">
       <div class="modal">
         <div class="modal-header">
