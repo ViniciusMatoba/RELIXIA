@@ -217,7 +217,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       h.cooldown = Math.max(0, h.cooldown - dt);
 
       const nearest = enemies
-        .filter(e => e.alive && e.x < h.x + 220 && e.x > h.x - 30)
+        .filter(e => e.alive && e.x < h.x + 100 && e.x > h.x - 30)
         .sort((a, b) => a.x - b.x)[0];
 
       if (nearest) {
@@ -325,7 +325,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       maxHp: hd.stats.hp,
       cooldown: 0,
       targetX: x + 60,
-      hasAnim,   // true = Sprite real; false = retângulo fallback
+      hasAnim,
+      spriteH,
     });
   }
 
@@ -336,7 +337,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     const enemyKey   = isBoss ? spriteConf.boss : (spriteConf.enemies?.[Math.floor(Math.random() * spriteConf.enemies.length)] || null);
     const hasAnim    = enemyKey && MANIFEST.sprites[enemyKey] && this.textures.exists(enemyKey);
 
-    const hp  = (isBoss ? 80 : 20) + killCount * 2 + tier * 10;
+    const hp  = (isBoss ? 200 : 60) + killCount * 3 + tier * 15;
     const atk = 3 + Math.floor(killCount * 0.1) + tier;
 
     const enemyScale = isBoss ? 4 : 2.5;
@@ -368,9 +369,10 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       hp, maxHp: hp,
       atk,
       alive: true,
-      speed: isBoss ? 0.04 : 0.05 + Math.random() * 0.025,
+      speed: isBoss ? 0.04 : 0.07 + Math.random() * 0.03,
       isBoss,
       spriteKey: enemyKey,
+      spriteH,
     });
   }
 
@@ -470,8 +472,9 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     const pct = Math.max(0, e.hp / e.maxHp);
     const maxW = e.hpBg?.width || 40;
     e.hpBar.width = maxW * pct;
-    if (e.hpBg) { e.hpBg.x = e.x; e.hpBg.y = e.y + 8; }
-    if (e.hpBar) { e.hpBar.x = e.x - maxW / 2; e.hpBar.y = e.y + 8; }
+    const barY = e.y - e.spriteH - 4;
+    if (e.hpBg) { e.hpBg.x = e.x; e.hpBg.y = barY; }
+    if (e.hpBar) { e.hpBar.x = e.x - maxW / 2; e.hpBar.y = barY; }
   }
 }
 
