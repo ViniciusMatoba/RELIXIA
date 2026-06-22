@@ -41,20 +41,25 @@ export function startCombat(dungeonId) {
 
   if (game) { game.destroy(true); game = null; }
 
-  const container = document.getElementById('phaser-container');
-  const W = container.clientWidth || 480;
-  const H = container.clientHeight || 500;
+  // Double-RAF: garante que o flex layout terminou antes de ler as dimensões
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      const container = document.getElementById('phaser-container');
+      const W = container.clientWidth  || 480;
+      const H = Math.max(container.clientHeight || 0, 300);
 
-  const sprites = DUNGEON_SPRITES[dungeonId];
+      const sprites = DUNGEON_SPRITES[dungeonId];
 
-  game = new Phaser.Game({
-    type: Phaser.AUTO,
-    width: W,
-    height: H,
-    backgroundColor: '#0a0612',
-    parent: 'phaser-container',
-    physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
-    scene: buildScene(dungeonId, dungeon, sprites, W, H),
+      game = new Phaser.Game({
+        type: Phaser.AUTO,
+        width: W,
+        height: H,
+        backgroundColor: '#0a0612',
+        parent: 'phaser-container',
+        physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
+        scene: buildScene(dungeonId, dungeon, sprites, W, H),
+      });
+    });
   });
 }
 
