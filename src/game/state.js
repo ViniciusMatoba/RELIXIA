@@ -1,4 +1,4 @@
-const SAVE_KEY = 'geek-pixel-idle-save';
+const SAVE_KEY = 'relixia-save';
 
 const DEFAULT_STATE = {
   gold: 200,
