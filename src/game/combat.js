@@ -51,9 +51,10 @@ export function startCombat(dungeonId) {
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const container = document.getElementById('phaser-container');
-      // Com position:absolute os valores são garantidos pelo browser
-      const W = container.clientWidth  || Math.min(window.innerWidth, 480);
-      const H = container.clientHeight || (window.innerHeight - 52 - 70);
+      const appEl = document.getElementById('app');
+      // Usa dimensões reais do container, com fallback pelo app/window
+      const W = container.offsetWidth  || appEl.offsetWidth  || Math.min(window.innerWidth, 480);
+      const H = container.offsetHeight || appEl.offsetHeight - 122 || window.innerHeight - 122;
 
       const sprites = DUNGEON_SPRITES[dungeonId];
 
