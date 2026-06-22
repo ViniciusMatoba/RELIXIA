@@ -216,8 +216,9 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
         .sort((a, b) => a.x - b.x)[0];
 
       if (nearest) {
-        if (h.sprite) {
-          if (!h.sprite.anims.isPlaying || h.sprite.anims.currentAnim?.key !== `${h.spriteKey}-attack`) {
+        // Ponto 2: só chama .play se for Sprite real (não retângulo de fallback)
+        if (h.hasAnim && h.sprite?.play) {
+          if (!h.sprite.anims?.isPlaying || h.sprite.anims.currentAnim?.key !== `${h.spriteKey}-attack`) {
             h.sprite.play(`${h.spriteKey}-attack`, true);
           }
         }
@@ -226,12 +227,12 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
           h.cooldown = 1 / (h.data.stats.speed || 1.0);
         }
       } else {
-        // Sem alvo: walk até o targetX individual de cada herói
         if (h.x < h.targetX) {
           h.x += 40 * dt;
-          if (h.sprite) { h.sprite.x = h.x; h.sprite.play(`${h.spriteKey}-walk`, true); }
+          if (h.sprite) h.sprite.x = h.x;
+          if (h.hasAnim && h.sprite?.play) h.sprite.play(`${h.spriteKey}-walk`, true);
         } else {
-          if (h.sprite) h.sprite.play(`${h.spriteKey}-idle`, true);
+          if (h.hasAnim && h.sprite?.play) h.sprite.play(`${h.spriteKey}-idle`, true);
         }
       }
 
@@ -318,7 +319,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       hp: hd.stats.hp,
       maxHp: hd.stats.hp,
       cooldown: 0,
-      targetX: x + 60,   // cada herói avança até seu próprio ponto de parada
+      targetX: x + 60,
+      hasAnim,   // true = Sprite real; false = retângulo fallback
     });
   }
 
@@ -333,7 +335,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     const atk = 3 + Math.floor(killCount * 0.1) + tier;
 
     const enemyScale = isBoss ? 4 : 2.5;
-    const ey         = Math.floor(H * 0.78);   // mesmo groundY dos heróis
+    const ey         = H - 40;   // mesmo groundY dos heróis (H - 40)
     const spriteH    = MANIFEST.frameHeight * enemyScale;
 
     let sprite = null;
