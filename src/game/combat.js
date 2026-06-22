@@ -129,31 +129,46 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       });
     });
 
-    const groundY = Math.floor(H * 0.78);   // 78% da altura = linha do chão
+    // groundY = fundo do canvas Phaser, que já exclui header(52) e footer(70)
+    // Personagens pisam aqui; o menu inferior da tela fica abaixo do canvas
+    const groundY  = H - 40;
+    const bgScale  = W / 1024;  // imagens de fundo têm 1024px de largura
 
-    // ── Fundo: gradiente garantido (camada 0) ──
+    // ── Gradiente garantido (camada 0) ──
     const g = this.add.graphics().setDepth(0);
     g.fillGradientStyle(0x050210, 0x050210, 0x1a0a38, 0x1a0a38, 1);
     g.fillRect(0, 0, W, H);
 
-    // ── Parallax: cada camada esticada para preencher W×H (camada 1-3) ──
+    // ── Parallax com escala e alinhamento por camada (sugestão Antigravity) ──
     if (spriteConfig?.parallax) {
-      spriteConfig.parallax.forEach((bg, i) => {
+      spriteConfig.parallax.forEach(bg => {
         if (!this.textures.exists(bg.key)) return;
-        // Centro da tela, origem central, DisplaySize garante preenchimento total
-        const tile = this.add.tileSprite(W / 2, H / 2, W, H, bg.key)
-          .setOrigin(0.5, 0.5)
-          .setDisplaySize(W, H)
-          .setDepth(1 + i);
-        bgs.push({ tile, speed: bg.speed });
+        try {
+          let tile;
+          if (bg.key === 'bg-sky') {
+            tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0);
+          } else if (bg.key === 'bg-mid') {
+            tile = this.add.tileSprite(0, groundY - W, W, W, bg.key).setOrigin(0, 0);
+          } else if (bg.key === 'bg-ground') {
+            tile = this.add.tileSprite(0, groundY - W, W, W + 40, bg.key).setOrigin(0, 0);
+          }
+          if (tile) {
+            tile.setTileScale(bgScale, bgScale);
+            tile.setScrollFactor(0);
+            tile.setDepth(1);
+            bgs.push({ tile, speed: bg.speed });
+          }
+        } catch (e) {
+          console.error('Erro ao criar camada parallax:', bg.key, e);
+        }
       });
     }
 
-    // ── Chão ──
-    this.add.rectangle(W / 2, groundY + 20, W, 40, 0x0a0518).setDepth(4);
+    // ── Chão visível ──
+    this.add.rectangle(W / 2, groundY + 20, W, 40, 0x0a0518).setDepth(3);
 
     // ── Heróis: espaçados no terço esquerdo ──
-    const heroScale  = Math.max(2.5, W / 160);   // escala relativa à largura
+    const heroScale  = Math.max(2.5, W / 160);
     const heroStartX = Math.floor(W * 0.12);
     const heroGap    = Math.floor(W * 0.18);
     Object.keys(LEAF_HERO_DATA).forEach((id, i) => {
