@@ -88,7 +88,7 @@ export async function compileGeekSprite(inputPath, outputPath, options = {}) {
   const frameBuffers = [];
   const isGrid = meta.width === 1024 && meta.height === 1024;
   const cellW = isGrid ? 256 : Math.floor(meta.width / TOTAL_FRAMES);
-  const cellH = isGrid ? 256 : meta.height;
+  const cellH = isGrid ? 341 : meta.height;
   const borderOffset = isGrid ? 8 : 0;
 
   console.log(`[Geek Compiler] Fatiando ${TOTAL_FRAMES} frames (tipo: ${isGrid ? 'Grade 3x4' : 'Tira Linear'}, célula: ${cellW}x${cellH}px, borda: ${borderOffset}px)...`);

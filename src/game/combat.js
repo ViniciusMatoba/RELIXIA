@@ -26,6 +26,15 @@ const DUNGEON_SPRITES = {
 const HERO_COLORS   = { naruto: 0xff8c00, sasuke: 0x4499ff, sakura: 0xff6b9d };
 const ENEMY_COLORS  = { nukenin: 0xff2222, zabuza: 0xff0000 };
 
+// ─── Mapeamento de Flip (Direção do Sprite) ──────────────────────────────────
+const SPRITE_FLIPS = {
+  naruto: true,   // original olha esquerda -> flip para direita
+  sakura: true,   // original olha esquerda -> flip para direita
+  sasuke: false,  // original olha direita -> não flipa (continua direita)
+  nukenin: true,  // original olha direita -> flip para esquerda
+  zabuza: true,   // original olha direita -> flip para esquerda
+};
+
 // ─── Dados dos heróis desta fase ─────────────────────────────────────────────
 const LEAF_HERO_DATA = {
   naruto: { id: 'naruto', name: 'Naruto Uzumaki', icon: '🍥', stats: { atk: 12, def: 6, hp: 80, speed: 1.2 }, ability: { name: 'Rasengan', icon: '🌀', damage: 40, cooldown: 5 }, spriteKey: 'naruto' },
@@ -46,6 +55,9 @@ export function startCombat(dungeonId) {
   };
 
   if (game) { game.destroy(true); game = null; }
+
+  const container = document.getElementById('phaser-container');
+  if (container) container.innerHTML = '';
 
   const sprites = DUNGEON_SPRITES[dungeonId];
 
@@ -73,13 +85,13 @@ export function startCombat(dungeonId) {
 }
 
 function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
-  return { preload, create, update };
-
   // ─── state ───────────────────────────────────────────────────────────────
   let heroes = [], enemies = [], projectiles = [];
   let killCount = 0, spawnTimer = 0;
   let bgs = [], killText, goldText;
   let hasSprites = false;
+
+  return { preload, create, update };
 
   // ─── PRELOAD ─────────────────────────────────────────────────────────────
   function preload() {
@@ -193,8 +205,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
   function update(time, delta) {
     const dt = delta / 1000;
 
-    // Scroll parallax
-    bgs.forEach(bg => { bg.tile.tilePositionX += bg.speed * delta * 0.05; });
+    // Scroll parallax (multiplicador de velocidade aumentado de 0.05 para 0.15 para dar real efeito de corrida)
+    bgs.forEach(bg => { bg.tile.tilePositionX += bg.speed * delta * 0.15; });
 
     // Spawn
     spawnTimer -= dt;
@@ -209,7 +221,10 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       e.x -= e.speed * delta;
       if (e.sprite) {
         e.sprite.x = e.x;
-        if (e.sprite.setFlipX) e.sprite.setFlipX(true);
+        if (e.sprite.setFlipX) {
+          const flipX = SPRITE_FLIPS[e.spriteKey] !== undefined ? SPRITE_FLIPS[e.spriteKey] : true;
+          e.sprite.setFlipX(flipX);
+        }
       }
       if (e.nameTag) e.nameTag.x = e.x;
       updateEntityHP(e);
@@ -227,6 +242,10 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       if (nearest) {
         // Ponto 2: só chama .play se for Sprite real (não retângulo de fallback)
         if (h.hasAnim && h.sprite?.play) {
+          if (h.sprite.setFlipX) {
+            const flipX = SPRITE_FLIPS[h.spriteKey] !== undefined ? SPRITE_FLIPS[h.spriteKey] : false;
+            h.sprite.setFlipX(flipX);
+          }
           if (!h.sprite.anims?.isPlaying || h.sprite.anims.currentAnim?.key !== `${h.spriteKey}-attack`) {
             h.sprite.play(`${h.spriteKey}-attack`, true);
           }
@@ -236,12 +255,18 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
           h.cooldown = 1 / (h.data.stats.speed || 1.0);
         }
       } else {
+        // Sem inimigos: avança até a posição alvo
         if (h.x < h.targetX) {
           h.x += 40 * dt;
           if (h.sprite) h.sprite.x = h.x;
-          if (h.hasAnim && h.sprite?.play) h.sprite.play(`${h.spriteKey}-walk`, true);
-        } else {
-          if (h.hasAnim && h.sprite?.play) h.sprite.play(`${h.spriteKey}-idle`, true);
+        }
+        // Corre no lugar (para manter animação contínua e sensação de esteira)
+        if (h.sprite && h.sprite.setFlipX) {
+          const flipX = SPRITE_FLIPS[h.spriteKey] !== undefined ? SPRITE_FLIPS[h.spriteKey] : false;
+          h.sprite.setFlipX(flipX);
+        }
+        if (h.hasAnim && h.sprite?.play) {
+          h.sprite.play(`${h.spriteKey}-walk`, true);
         }
       }
 
@@ -303,7 +328,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setFlipX(false).setDepth(5);
+        const flipX = SPRITE_FLIPS[spriteKey] !== undefined ? SPRITE_FLIPS[spriteKey] : false;
+        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setFlipX(flipX).setDepth(5);
         try { sprite.play(`${spriteKey}-idle`); } catch(e) { console.warn('anim idle falhou', spriteKey, e); }
       } catch (_) { sprite = null; }
     }
@@ -351,7 +377,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(true).setDepth(5);
+        const flipX = SPRITE_FLIPS[enemyKey] !== undefined ? SPRITE_FLIPS[enemyKey] : true;
+        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(flipX).setDepth(5);
         try { sprite.play(`${enemyKey}-walk`); } catch(e) { console.warn('anim walk falhou', enemyKey, e); }
       } catch (_) { sprite = null; }
     }

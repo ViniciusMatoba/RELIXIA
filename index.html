@@ -5,6 +5,97 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>RELIXIA — Heróis Sem Carteira Assinada</title>
   <link rel="stylesheet" href="./src/styles/main.css" />
+  <script>
+    window.addEventListener('error', function(e) {
+      var div = document.getElementById('mobile-debug-console');
+      if (!div) {
+        div = document.createElement('div');
+        div.id = 'mobile-debug-console';
+        div.style.position = 'fixed';
+        div.style.top = '0';
+        div.style.left = '0';
+        div.style.width = '100%';
+        div.style.background = 'rgba(220, 53, 69, 0.95)';
+        div.style.color = 'white';
+        div.style.zIndex = '999999';
+        div.style.padding = '12px';
+        div.style.fontSize = '11px';
+        div.style.fontFamily = 'monospace';
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.maxHeight = '45vh';
+        div.style.overflow = 'auto';
+        div.style.borderBottom = '3px solid #721c24';
+        // Create close button
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕ Fechar';
+        closeBtn.style.float = 'right';
+        closeBtn.style.background = '#721c24';
+        closeBtn.style.color = 'white';
+        closeBtn.style.border = 'none';
+        closeBtn.style.padding = '3px 8px';
+        closeBtn.style.borderRadius = '4px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.onclick = function() { div.remove(); };
+        div.appendChild(closeBtn);
+        
+        var title = document.createElement('div');
+        title.style.fontWeight = 'bold';
+        title.style.marginBottom = '6px';
+        title.textContent = '🚨 CONSOLE DE ERROS MOBILE:';
+        div.appendChild(title);
+        
+        document.body.appendChild(div);
+      }
+      var msg = document.createElement('div');
+      msg.textContent = '[JS Error] ' + e.message + ' (' + (e.filename ? e.filename.split('/').pop() : 'unknown') + ':' + e.lineno + ')';
+      div.appendChild(msg);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      var div = document.getElementById('mobile-debug-console');
+      if (!div) {
+        // reuse same logic above if needed
+        div = document.createElement('div');
+        div.id = 'mobile-debug-console';
+        div.style.position = 'fixed';
+        div.style.top = '0';
+        div.style.left = '0';
+        div.style.width = '100%';
+        div.style.background = 'rgba(220, 53, 69, 0.95)';
+        div.style.color = 'white';
+        div.style.zIndex = '999999';
+        div.style.padding = '12px';
+        div.style.fontSize = '11px';
+        div.style.fontFamily = 'monospace';
+        div.style.whiteSpace = 'pre-wrap';
+        div.style.maxHeight = '45vh';
+        div.style.overflow = 'auto';
+        div.style.borderBottom = '3px solid #721c24';
+        
+        var closeBtn = document.createElement('button');
+        closeBtn.textContent = '✕ Fechar';
+        closeBtn.style.float = 'right';
+        closeBtn.style.background = '#721c24';
+        closeBtn.style.color = 'white';
+        closeBtn.style.border = 'none';
+        closeBtn.style.padding = '3px 8px';
+        closeBtn.style.borderRadius = '4px';
+        closeBtn.style.cursor = 'pointer';
+        closeBtn.onclick = function() { div.remove(); };
+        div.appendChild(closeBtn);
+        
+        var title = document.createElement('div');
+        title.style.fontWeight = 'bold';
+        title.style.marginBottom = '6px';
+        title.textContent = '🚨 CONSOLE DE ERROS MOBILE:';
+        div.appendChild(title);
+        
+        document.body.appendChild(div);
+      }
+      var msg = document.createElement('div');
+      msg.textContent = '[Unhandled Promise] ' + e.reason;
+      div.appendChild(msg);
+    });
+  </script>
 </head>
 <body>
   <div id="app">
