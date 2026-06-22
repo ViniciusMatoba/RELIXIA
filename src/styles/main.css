@@ -59,8 +59,8 @@ body {
 }
 
 /* ===== SCREENS ===== */
-.screen { display: none; min-height: 100vh; }
-.screen.active { display: flex; flex-direction: column; }
+.screen { display: none; min-height: 100%; flex: 1; }
+.screen.active { display: flex; flex-direction: column; flex: 1; }
 
 /* ===== HUB BG ===== */
 .hub-bg {
