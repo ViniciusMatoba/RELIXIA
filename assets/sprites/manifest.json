@@ -3,7 +3,7 @@
   "frameHeight": 48,
   "sprites": {
     "naruto": {
-      "file": "assets/sprites/naruto.png?v=2",
+      "file": "assets/sprites/naruto.png?v=3",
       "animations": {
         "idle": { "start": 0, "end": 3, "frameRate": 8, "repeat": -1 },
         "walk": { "start": 4, "end": 7, "frameRate": 10, "repeat": -1 },
@@ -11,7 +11,7 @@
       }
     },
     "sasuke": {
-      "file": "assets/sprites/sasuke.png?v=2",
+      "file": "assets/sprites/sasuke.png?v=3",
       "animations": {
         "idle": { "start": 0, "end": 3, "frameRate": 8, "repeat": -1 },
         "walk": { "start": 4, "end": 7, "frameRate": 10, "repeat": -1 },
@@ -19,7 +19,7 @@
       }
     },
     "sakura": {
-      "file": "assets/sprites/sakura.png?v=2",
+      "file": "assets/sprites/sakura.png?v=3",
       "animations": {
         "idle": { "start": 0, "end": 3, "frameRate": 8, "repeat": -1 },
         "walk": { "start": 4, "end": 7, "frameRate": 10, "repeat": -1 },
@@ -27,7 +27,7 @@
       }
     },
     "nukenin": {
-      "file": "assets/sprites/nukenin.png?v=2",
+      "file": "assets/sprites/nukenin.png?v=3",
       "animations": {
         "idle": { "start": 0, "end": 3, "frameRate": 8, "repeat": -1 },
         "walk": { "start": 4, "end": 7, "frameRate": 8, "repeat": -1 },
@@ -35,7 +35,7 @@
       }
     },
     "zabuza": {
-      "file": "assets/sprites/zabuza.png?v=2",
+      "file": "assets/sprites/zabuza.png?v=3",
       "animations": {
         "idle": { "start": 0, "end": 3, "frameRate": 6, "repeat": -1 },
         "walk": { "start": 4, "end": 7, "frameRate": 8, "repeat": -1 },
