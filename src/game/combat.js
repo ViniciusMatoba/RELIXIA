@@ -129,33 +129,37 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       });
     });
 
-    const groundY = H - 60;
+    const groundY = Math.floor(H * 0.78);   // 78% da altura = linha do chão
 
-    // ── Fundo: gradiente sempre desenhado primeiro (camada 0) ──
+    // ── Fundo: gradiente garantido (camada 0) ──
     const g = this.add.graphics().setDepth(0);
     g.fillGradientStyle(0x050210, 0x050210, 0x1a0a38, 0x1a0a38, 1);
     g.fillRect(0, 0, W, H);
 
-    // ── Parallax por cima se os assets carregaram (camada 1) ──
+    // ── Parallax: cada camada esticada para preencher W×H (camada 1-3) ──
     if (spriteConfig?.parallax) {
-      spriteConfig.parallax.forEach(bg => {
+      spriteConfig.parallax.forEach((bg, i) => {
         if (!this.textures.exists(bg.key)) return;
-        const tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0).setDepth(1);
+        // Centro da tela, origem central, DisplaySize garante preenchimento total
+        const tile = this.add.tileSprite(W / 2, H / 2, W, H, bg.key)
+          .setOrigin(0.5, 0.5)
+          .setDisplaySize(W, H)
+          .setDepth(1 + i);
         bgs.push({ tile, speed: bg.speed });
       });
     }
 
     // ── Chão ──
-    this.add.rectangle(W / 2, groundY + 30, W, 60, 0x0d0820).setDepth(2);
+    this.add.rectangle(W / 2, groundY + 20, W, 40, 0x0a0518).setDepth(4);
 
-    // Todos os heróis espaçados no terço esquerdo da tela
-    const heroY = groundY;          // pés no chão
-    const heroStartX = 60;
-    const heroGap    = 100;
+    // ── Heróis: espaçados no terço esquerdo ──
+    const heroScale  = Math.max(2.5, W / 160);   // escala relativa à largura
+    const heroStartX = Math.floor(W * 0.12);
+    const heroGap    = Math.floor(W * 0.18);
     Object.keys(LEAF_HERO_DATA).forEach((id, i) => {
       const hd = LEAF_HERO_DATA[id];
       if (!hd) return;
-      spawnHero.call(this, hd, heroStartX + i * heroGap, heroY);
+      spawnHero.call(this, hd, heroStartX + i * heroGap, groundY, heroScale);
     });
 
     // HUD textos
@@ -266,29 +270,28 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
   }
 
   // ─── helpers ─────────────────────────────────────────────────────────────
-  function spawnHero(hd, x, y) {
-    const spriteKey = hd.spriteKey || hd.id;
-    const hasAnim   = MANIFEST.sprites[spriteKey] && this.textures.exists(spriteKey);
+  function spawnHero(hd, x, y, scale = 3) {
+    const spriteKey  = hd.spriteKey || hd.id;
+    const hasAnim    = MANIFEST.sprites[spriteKey] && this.textures.exists(spriteKey);
+    const spriteH    = MANIFEST.frameHeight * scale;   // altura visual do sprite
 
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(2).setDepth(5);
+        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setDepth(5);
         sprite.play(`${spriteKey}-idle`);
       } catch (_) { sprite = null; }
     }
     if (!sprite) {
-      sprite = this.add.rectangle(x, y, 36, 64, HERO_COLORS[spriteKey] || 0x7e57c2).setOrigin(0.5, 1).setDepth(5);
+      sprite = this.add.rectangle(x, y, 36, spriteH, HERO_COLORS[spriteKey] || 0x7e57c2).setOrigin(0.5, 1).setDepth(5);
     }
 
-    // Barra HP acima do herói
-    const barY  = y - 100;
+    // Barra HP e nome acima do sprite
+    const barY  = y - spriteH - 8;
     const hpBg  = this.add.rectangle(x, barY, 44, 6, 0x111111).setDepth(8);
     const hpBar = this.add.rectangle(x - 22, barY, 44, 6, 0x44ee66).setOrigin(0, 0.5).setDepth(9);
-
-    // Label do nome
-    this.add.text(x, barY - 10, (hd.name || id).split(' ')[0], {
-      fontSize: '9px', color: '#e1dbec', fontFamily: 'Outfit'
+    this.add.text(x, barY - 6, (hd.name || hd.id).split(' ')[0], {
+      fontSize: '10px', color: '#e1dbec', fontFamily: 'Outfit'
     }).setOrigin(0.5, 1).setDepth(9);
 
     heroes.push({
@@ -314,25 +317,28 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     const hp  = (isBoss ? 80 : 20) + killCount * 2 + tier * 10;
     const atk = 3 + Math.floor(killCount * 0.1) + tier;
 
-    const ey = H - 60;   // pés no mesmo chão
+    const enemyScale = isBoss ? 4 : 2.5;
+    const ey         = Math.floor(H * 0.78);   // mesmo groundY dos heróis
+    const spriteH    = MANIFEST.frameHeight * enemyScale;
 
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(isBoss ? 2.5 : 2).setFlipX(true).setDepth(5);
+        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(true).setDepth(5);
         sprite.play(`${enemyKey}-walk`);
       } catch (_) { sprite = null; }
     }
     if (!sprite) {
-      sprite = this.add.rectangle(x, ey, isBoss ? 48 : 32, isBoss ? 64 : 48, isBoss ? 0xcc0000 : 0x664444).setOrigin(0.5, 1).setDepth(5);
+      sprite = this.add.rectangle(x, ey, isBoss ? 52 : 36, spriteH, isBoss ? 0xcc0000 : 0x664444).setOrigin(0.5, 1).setDepth(5);
     }
 
-    const barY  = ey - 90;
-    const label = this.add.text(x, barY - 10, isBoss ? `💀 ${dungeon.boss}` : dungeon.enemies[0],
-      { fontSize: isBoss ? '10px' : '8px', color: isBoss ? '#ff4444' : '#ffaaaa', fontFamily: 'Outfit' }).setOrigin(0.5, 1).setDepth(9);
+    const barY  = ey - spriteH - 8;
+    const label = this.add.text(x, barY - 6, isBoss ? `💀 ${dungeon.boss}` : dungeon.enemies[0],
+      { fontSize: isBoss ? '11px' : '9px', color: isBoss ? '#ff4444' : '#ffaaaa', fontFamily: 'Outfit' }).setOrigin(0.5, 1).setDepth(9);
 
-    const hpBg  = this.add.rectangle(x, barY, isBoss ? 52 : 36, 6, 0x111111).setDepth(8);
-    const hpBar = this.add.rectangle(x - (isBoss ? 26 : 18), barY, isBoss ? 52 : 36, 6, 0xff3333).setOrigin(0, 0.5).setDepth(9);
+    const barW  = isBoss ? 56 : 40;
+    const hpBg  = this.add.rectangle(x, barY, barW, 6, 0x111111).setDepth(8);
+    const hpBar = this.add.rectangle(x - barW / 2, barY, barW, 6, 0xff3333).setOrigin(0, 0.5).setDepth(9);
 
     enemies.push({
       sprite, nameTag: label, hpBg, hpBar,
