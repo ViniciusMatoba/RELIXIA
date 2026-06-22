@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>RELIXIA — Heróis Sem Carteira Assinada</title>
-  <script type="module" crossorigin src="/RELIXIA/assets/index-C6I-lJEC.js"></script>
-  <link rel="stylesheet" crossorigin href="/RELIXIA/assets/index-kSe4aI8k.css">
+  <script type="module" crossorigin src="/RELIXIA/assets/index-1hMshEtq.js"></script>
+  <link rel="stylesheet" crossorigin href="/RELIXIA/assets/index-DfhoUU0T.css">
 </head>
 <body>
   <div id="app">
@@ -25,6 +25,9 @@
 
       <!-- Área central — fundo do hub -->
       <div class="hub-center">
+        <!-- Botão force reload dentro do centro para não ocupar slot do grid -->
+        <button class="btn-force-reload" onclick="forceReload()" title="Forçar atualização">🔄</button>
+
         <div class="hub-title-block">
           <h1 class="hub-main-title">RELIXIA</h1>
           <p class="hub-main-sub">Heróis Sem Carteira Assinada</p>
@@ -40,9 +43,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Botão de força atualização (dev) -->
-      <button class="btn-force-reload" onclick="forceReload()" title="Forçar atualização">🔄</button>
 
       <!-- Barra de menu inferior -->
       <nav class="hub-navbar">
