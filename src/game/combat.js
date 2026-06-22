@@ -147,15 +147,17 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
           let tile;
           if (bg.key === 'bg-sky') {
             tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0);
+            tile.setDepth(1); // céu — camada mais distante
           } else if (bg.key === 'bg-mid') {
             tile = this.add.tileSprite(0, groundY - W, W, W, bg.key).setOrigin(0, 0);
+            tile.setDepth(2); // casas — atrás do chão
           } else if (bg.key === 'bg-ground') {
             tile = this.add.tileSprite(0, groundY - W, W, W + 40, bg.key).setOrigin(0, 0);
+            tile.setDepth(3); // terra batida — na frente das casas
           }
           if (tile) {
             tile.setTileScale(bgScale, bgScale);
             tile.setScrollFactor(0);
-            tile.setDepth(1);
             bgs.push({ tile, speed: bg.speed });
           }
         } catch (e) {
