@@ -51,12 +51,13 @@ export function startCombat(dungeonId) {
       const sprites = DUNGEON_SPRITES[dungeonId];
 
       game = new Phaser.Game({
-        type: Phaser.AUTO,
+        type: Phaser.CANVAS,
         width: W,
         height: H,
         backgroundColor: '#0a0612',
         parent: 'phaser-container',
         physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
+        render: { preserveDrawingBuffer: true },
         scene: buildScene(dungeonId, dungeon, sprites, W, H),
       });
     });
