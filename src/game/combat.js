@@ -58,13 +58,14 @@ export function startCombat(dungeonId) {
       const sprites = DUNGEON_SPRITES[dungeonId];
 
       game = new Phaser.Game({
-        type: Phaser.CANVAS,
+        type: Phaser.AUTO,
         width: W,
         height: H,
-        backgroundColor: '#0a0612',
+        backgroundColor: '#1a0f30',
         parent: 'phaser-container',
         physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
-        render: { preserveDrawingBuffer: true },
+        render: { preserveDrawingBuffer: true, antialias: false },
+        scale: { mode: Phaser.Scale.NONE },
         scene: buildScene(dungeonId, dungeon, sprites, W, H),
       });
     });
@@ -102,33 +103,42 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
 
   // ─── CREATE ──────────────────────────────────────────────────────────────
   function create() {
-    // Animações globais (uma vez por chave)
+    // Animações: só cria se a textura foi carregada com sucesso
     Object.entries(MANIFEST.sprites).forEach(([key, def]) => {
+      if (!this.textures.exists(key)) return;
       Object.entries(def.animations).forEach(([animName, cfg]) => {
         const fullKey = `${key}-${animName}`;
         if (!this.anims.exists(fullKey)) {
-          this.anims.create({
-            key: fullKey,
-            frames: this.anims.generateFrameNumbers(key, { start: cfg.start, end: cfg.end }),
-            frameRate: cfg.frameRate,
-            repeat: cfg.repeat,
-          });
+          try {
+            this.anims.create({
+              key: fullKey,
+              frames: this.anims.generateFrameNumbers(key, { start: cfg.start, end: cfg.end }),
+              frameRate: cfg.frameRate,
+              repeat: cfg.repeat,
+            });
+          } catch (_) {}
         }
       });
     });
 
-    // Parallax
+    // Fundo sempre desenhado — parallax se carregou, senão gradiente
     const groundY = H - 40;
-    if (spriteConfig?.parallax && hasSprites) {
+    let usedParallax = false;
+    if (spriteConfig?.parallax) {
       spriteConfig.parallax.forEach(bg => {
-        const tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0);
-        tile.setScrollFactor(0);
-        bgs.push({ tile, speed: bg.speed });
+        if (!this.textures.exists(bg.key)) return;
+        try {
+          const tile = this.add.tileSprite(0, 0, W, H, bg.key).setOrigin(0, 0);
+          tile.setScrollFactor(0);
+          bgs.push({ tile, speed: bg.speed });
+          usedParallax = true;
+        } catch (_) {}
       });
-    } else {
-      // Fallback degradê
+    }
+    if (!usedParallax) {
+      // Fallback degradê sempre visível
       const g = this.add.graphics();
-      g.fillGradientStyle(0x0a0510, 0x0a0510, 0x1a1040, 0x1a1040, 1);
+      g.fillGradientStyle(0x120a28, 0x120a28, 0x2a1a50, 0x2a1a50, 1);
       g.fillRect(0, 0, W, H);
     }
 
@@ -258,13 +268,16 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
   // ─── helpers ─────────────────────────────────────────────────────────────
   function spawnHero(hd, x, y) {
     const spriteKey = hd.spriteKey || hd.id;
-    const hasAnim   = MANIFEST.sprites[spriteKey];
+    const hasAnim   = MANIFEST.sprites[spriteKey] && this.textures.exists(spriteKey);
 
     let sprite = null;
     if (hasAnim) {
-      sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(2.5).setDepth(5);
-      sprite.play(`${spriteKey}-idle`);
-    } else {
+      try {
+        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(2.5).setDepth(5);
+        sprite.play(`${spriteKey}-idle`);
+      } catch (_) { sprite = null; }
+    }
+    if (!sprite) {
       sprite = this.add.rectangle(x, y, 36, 48, HERO_COLORS[spriteKey] || 0x7e57c2).setOrigin(0.5, 1).setDepth(5);
     }
 
@@ -291,16 +304,19 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     const isBoss  = killCount > 0 && killCount % 20 === 0;
     const spriteConf = spriteConfig || {};
     const enemyKey   = isBoss ? spriteConf.boss : (spriteConf.enemies?.[Math.floor(Math.random() * spriteConf.enemies.length)] || null);
-    const hasAnim    = enemyKey && MANIFEST.sprites[enemyKey];
+    const hasAnim    = enemyKey && MANIFEST.sprites[enemyKey] && this.textures.exists(enemyKey);
 
     const hp  = (isBoss ? 80 : 20) + killCount * 2 + tier * 10;
     const atk = 3 + Math.floor(killCount * 0.1) + tier;
 
     let sprite = null;
     if (hasAnim) {
-      sprite = this.add.sprite(x, y, enemyKey).setOrigin(0.5, 1).setScale(isBoss ? 3 : 2.5).setFlipX(true).setDepth(5);
-      sprite.play(`${enemyKey}-walk`);
-    } else {
+      try {
+        sprite = this.add.sprite(x, y, enemyKey).setOrigin(0.5, 1).setScale(isBoss ? 3 : 2.5).setFlipX(true).setDepth(5);
+        sprite.play(`${enemyKey}-walk`);
+      } catch (_) { sprite = null; }
+    }
+    if (!sprite) {
       sprite = this.add.rectangle(x, y, isBoss ? 52 : 36, isBoss ? 64 : 48, isBoss ? 0xcc0000 : 0x664444).setOrigin(0.5, 1).setDepth(5);
     }
 
