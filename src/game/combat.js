@@ -83,7 +83,9 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
 
   // ─── PRELOAD ─────────────────────────────────────────────────────────────
   function preload() {
-    // Escuta erros de carregamento e exibe no console e via toast
+    // Garante que o Phaser busca assets em /RELIXIA/assets/... no GitHub Pages
+    this.load.baseURL = import.meta.env.BASE_URL;
+
     this.load.on('loaderror', (file) => {
       console.error('[Phaser Load Error]', file.key, file.url);
       showToast(`Erro ao carregar asset: ${file.key} (${file.url})`, 'error');
