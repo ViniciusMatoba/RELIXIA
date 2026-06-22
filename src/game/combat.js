@@ -23,14 +23,14 @@ const DUNGEON_SPRITES = {
 };
 
 // ─── Fallback: rect colorido quando não há sprite ────────────────────────────
-const HERO_COLORS   = { naruto: 0xff8c00, sasuke: 0x3a1f8f, sakura: 0xff6b9d };
+const HERO_COLORS   = { naruto: 0xff8c00, sasuke: 0x4499ff, sakura: 0xff6b9d };
 const ENEMY_COLORS  = { nukenin: 0x444466, zabuza: 0x880000 };
 
 // ─── Dados dos heróis desta fase ─────────────────────────────────────────────
 const LEAF_HERO_DATA = {
-  naruto: { ...HEROES.find(h => h.id === 'naruto'), spriteKey: 'naruto' },
-  sasuke: { id: 'sasuke', name: 'Sasuke Uchiha',   icon: '⚡', stats: { atk: 14, def: 8, hp: 85, speed: 1.3 }, ability: { name: 'Chidori', icon: '⚡', damage: 50, cooldown: 5 }, spriteKey: 'sasuke', rarity: 'rare' },
-  sakura: { id: 'sakura', name: 'Sakura Haruno',   icon: '🌸', stats: { atk: 8,  def: 6, hp: 70, speed: 1.0 }, ability: { name: 'Cura',    icon: '💚', damage: 0,  cooldown: 6 }, spriteKey: 'sakura', rarity: 'common' },
+  naruto: { id: 'naruto', name: 'Naruto Uzumaki', icon: '🍥', stats: { atk: 12, def: 6, hp: 80, speed: 1.2 }, ability: { name: 'Rasengan', icon: '🌀', damage: 40, cooldown: 5 }, spriteKey: 'naruto' },
+  sasuke: { id: 'sasuke', name: 'Sasuke Uchiha',  icon: '⚡', stats: { atk: 14, def: 8, hp: 85, speed: 1.3 }, ability: { name: 'Chidori',  icon: '⚡', damage: 50, cooldown: 5 }, spriteKey: 'sasuke' },
+  sakura: { id: 'sakura', name: 'Sakura Haruno',  icon: '🌸', stats: { atk: 8,  def: 6, hp: 70, speed: 1.0 }, ability: { name: 'Cura',     icon: '💚', damage: 0,  cooldown: 6 }, spriteKey: 'sakura' },
 };
 
 export function startCombat(dungeonId) {
@@ -176,7 +176,11 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     Object.keys(LEAF_HERO_DATA).forEach((id, i) => {
       const hd = LEAF_HERO_DATA[id];
       if (!hd) return;
-      spawnHero.call(this, hd, heroStartX + i * heroGap, groundY, heroScale);
+      try {
+        spawnHero.call(this, hd, heroStartX + i * heroGap, groundY, heroScale);
+      } catch (err) {
+        console.error('[spawnHero] falhou para', id, err);
+      }
     });
 
     // HUD textos
