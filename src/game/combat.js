@@ -15,9 +15,9 @@ const DUNGEON_SPRITES = {
     enemies: ['nukenin'],
     boss:    'zabuza',
     parallax: [
-      { key: 'bg-sky',    file: 'assets/backgrounds/leaf_sky.png',    speed: 0.1 },
-      { key: 'bg-mid',    file: 'assets/backgrounds/leaf_mid.png',    speed: 0.3 },
-      { key: 'bg-ground', file: 'assets/backgrounds/leaf_ground.png', speed: 0.6 },
+      { key: 'bg-sky',    file: 'assets/backgrounds/leaf_sky.png?v=2',    speed: 0.1 },
+      { key: 'bg-mid',    file: 'assets/backgrounds/leaf_mid.png?v=2',    speed: 0.3 },
+      { key: 'bg-ground', file: 'assets/backgrounds/leaf_ground.png?v=2', speed: 0.6 },
     ],
   },
 };
