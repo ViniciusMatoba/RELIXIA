@@ -39,14 +39,22 @@ export function startCombat(dungeonId) {
   const dungeon = DUNGEONS.find(d => d.id === dungeonId);
   document.getElementById('combat-dungeon-name').textContent = dungeon.name;
 
+  // Back button registrado imediatamente — não depende do Phaser carregar
+  document.getElementById('btn-back-hub').onclick = () => {
+    if (game) { game.destroy(true); game = null; }
+    showHub();
+  };
+
   if (game) { game.destroy(true); game = null; }
 
-  // Double-RAF: garante que o flex layout terminou antes de ler as dimensões
+  // Double-RAF: garante que o layout terminou antes de ler as dimensões
   requestAnimationFrame(() => {
     requestAnimationFrame(() => {
       const container = document.getElementById('phaser-container');
-      const W = container.clientWidth  || 480;
-      const H = Math.max(container.clientHeight || 0, 300);
+      const appEl     = document.getElementById('app');
+      // Fallback robusto: usa app ou viewport se container ainda colapso
+      const W = container.clientWidth  || appEl.clientWidth  || Math.min(window.innerWidth, 480);
+      const H = Math.max(container.clientHeight || (appEl.clientHeight - 110) || window.innerHeight - 110, 280);
 
       const sprites = DUNGEON_SPRITES[dungeonId];
 
@@ -145,10 +153,6 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     killText = this.add.text(12, 12, 'Kills: 0',        { fontSize: '13px', color: '#e1dbec', fontFamily: 'Outfit, sans-serif' }).setDepth(10);
     goldText = this.add.text(12, 30, `💰 ${Math.floor(state.gold)}`, { fontSize: '13px', color: '#ffca28', fontFamily: 'Outfit, sans-serif' }).setDepth(10);
 
-    document.getElementById('btn-back-hub').onclick = () => {
-      if (game) { game.destroy(true); game = null; }
-      showHub();
-    };
   }
 
   // ─── UPDATE ──────────────────────────────────────────────────────────────

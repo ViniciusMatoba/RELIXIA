@@ -315,18 +315,19 @@ body {
 /* ===== TELA DE COMBATE ===== */
 #combat-screen {
   background: #050308;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-rows: 52px 1fr 70px;
+  grid-template-columns: 1fr;
   flex: 1;
   min-height: 0;
-  height: 100%;
 }
 
 .combat-header {
+  grid-row: 1;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 20px;
+  padding: 0 20px;
   background: rgba(21, 17, 46, 0.95);
   border-bottom: 1px solid var(--border);
   font-family: var(--font-title);
@@ -354,20 +355,28 @@ body {
 }
 
 #phaser-container {
-  flex: 1;
+  grid-row: 2;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: stretch;
+  justify-content: stretch;
   background: radial-gradient(circle, #100b26 0%, #050308 100%);
+  overflow: hidden;
+}
+
+#phaser-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }
 
 .combat-footer {
-  padding: 12px 20px;
+  grid-row: 3;
+  padding: 8px 20px;
   background: rgba(21, 17, 46, 0.95);
   border-top: 1px solid var(--border);
   display: flex;
   gap: 12px;
-  min-height: 70px;
+  overflow: hidden;
   flex-wrap: wrap;
   align-items: center;
 }
