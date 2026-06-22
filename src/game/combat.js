@@ -203,7 +203,10 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     enemies.forEach(e => {
       if (!e.alive) return;
       e.x -= e.speed * delta;
-      if (e.sprite) { e.sprite.x = e.x; e.sprite.setFlipX(false); }
+      if (e.sprite) {
+        e.sprite.x = e.x;
+        if (e.sprite.setFlipX) e.sprite.setFlipX(true);
+      }
       if (e.nameTag) e.nameTag.x = e.x;
       updateEntityHP(e);
     });

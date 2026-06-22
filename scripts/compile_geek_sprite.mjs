@@ -60,12 +60,22 @@ async function processAlpha(buffer, width, height, tolerance = 45, feather = 25)
  * Recorta, redimensiona, centraliza os frames e junta em uma tira horizontal 576x48px.
  */
 export async function compileGeekSprite(inputPath, outputPath, options = {}) {
-  const tolerance = options.tolerance ?? 45;
-  const feather = options.feather ?? 25;
+  const tolerance = options.tolerance ?? 115;
+  const feather = options.feather ?? 15;
   const fitSize = options.fitSize ?? 38; // Encolhe levemente para não encostar nas bordas (48px)
 
   if (!fs.existsSync(inputPath)) {
     throw new Error(`Imagem de entrada não encontrada: ${inputPath}`);
+  }
+
+  // Helper to count active pixels
+  async function countActivePixels(buf) {
+    const { data } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let count = 0;
+    for (let i = 3; i < data.length; i += 4) {
+      if (data[i] > 30) count++;
+    }
+    return count;
   }
 
   // 1. Carrega e remove o fundo da imagem inteira
@@ -79,8 +89,9 @@ export async function compileGeekSprite(inputPath, outputPath, options = {}) {
   const isGrid = meta.width === 1024 && meta.height === 1024;
   const cellW = isGrid ? 256 : Math.floor(meta.width / TOTAL_FRAMES);
   const cellH = isGrid ? 256 : meta.height;
+  const borderOffset = isGrid ? 16 : 0;
 
-  console.log(`[Geek Compiler] Fatiando ${TOTAL_FRAMES} frames (tipo: ${isGrid ? 'Grade 3x4' : 'Tira Linear'}, célula: ${cellW}x${cellH}px)...`);
+  console.log(`[Geek Compiler] Fatiando ${TOTAL_FRAMES} frames (tipo: ${isGrid ? 'Grade 3x4' : 'Tira Linear'}, célula: ${cellW}x${cellH}px, borda: ${borderOffset}px)...`);
 
   for (let i = 0; i < TOTAL_FRAMES; i++) {
     let left, top;
@@ -94,36 +105,46 @@ export async function compileGeekSprite(inputPath, outputPath, options = {}) {
       top = 0;
     }
     
-    // Extrai o frame individual
+    // Extrai o frame individual com margem de segurança para ignorar grid lines
     let frameSharp = sharp(transparentBuffer)
       .clone()
-      .extract({ left, top, width: cellW, height: cellH });
+      .extract({ 
+        left: left + borderOffset, 
+        top: top + borderOffset, 
+        width: cellW - 2 * borderOffset, 
+        height: cellH - 2 * borderOffset 
+      });
 
     // Redimensiona o sprite para caber no fitSize mantendo proporções
-    // (ex: reduz o sprite para até 38px para caber na moldura de 48px com margem)
     frameSharp = frameSharp.resize(fitSize, fitSize, {
       fit: 'inside',
       background: { r: 0, g: 0, b: 0, alpha: 0 }
     });
 
     const frameBuf = await frameSharp.png().toBuffer();
-    const frameMeta = await sharp(frameBuf).metadata();
+    const activePixels = await countActivePixels(frameBuf);
 
-    // Centraliza o frame dentro de uma moldura transparente padrão de 48x48px
-    const offLeft = Math.round((FRAME_W - frameMeta.width) / 2);
-    const offTop = FRAME_H - frameMeta.height - 2; // Coloca o personagem ancorado próximo à base (2px de margem na base)
+    let finalCellBuf;
+    if (activePixels < 80 && i > 0 && (i % 4) > 0) {
+      console.log(`[Geek Compiler] Frame ${i} está vazio (${activePixels} px), usando Frame ${i-1} como fallback...`);
+      finalCellBuf = frameBuffers[i - 1];
+    } else {
+      const frameMeta = await sharp(frameBuf).metadata();
+      const offLeft = Math.round((FRAME_W - frameMeta.width) / 2);
+      const offTop = FRAME_H - frameMeta.height - 2; // Coloca o personagem ancorado próximo à base (2px de margem na base)
 
-    const finalCellBuf = await sharp({
-      create: {
-        width: FRAME_W,
-        height: FRAME_H,
-        channels: 4,
-        background: { r: 0, g: 0, b: 0, alpha: 0 }
-      }
-    })
-    .composite([{ input: frameBuf, left: offLeft, top: offTop }])
-    .png()
-    .toBuffer();
+      finalCellBuf = await sharp({
+        create: {
+          width: FRAME_W,
+          height: FRAME_H,
+          channels: 4,
+          background: { r: 0, g: 0, b: 0, alpha: 0 }
+        }
+      })
+      .composite([{ input: frameBuf, left: offLeft, top: offTop }])
+      .png()
+      .toBuffer();
+    }
 
     frameBuffers.push(finalCellBuf);
   }
