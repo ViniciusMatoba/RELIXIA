@@ -49,9 +49,9 @@ export function startCombat(dungeonId) {
 
   const sprites = DUNGEON_SPRITES[dungeonId];
 
-  // Dimensões fixas de design — Scale Manager ajusta para caber no container
+  // Layout global: header(52) + global-footer(72) + combat-header(44) + heroes-strip(48)
   const W = 480;
-  const H = Math.max(window.innerHeight - 122, 350);
+  const H = Math.max(window.innerHeight - 52 - 72 - 44 - 48, 280);
 
   game = new Phaser.Game({
     type: Phaser.AUTO,

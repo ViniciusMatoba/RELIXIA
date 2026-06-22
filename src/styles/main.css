@@ -69,29 +69,49 @@ body {
   }
 }
 
-/* ===== SCREENS ===== */
-/* Todas as telas ficam empilhadas dentro de #app (position:relative) */
-.screen { display: none; }
-.screen.active {
-  display: block;
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  overflow: hidden;
-}
+/* ===== LAYOUT GLOBAL (header + content + footer sempre visíveis) ===== */
 
-/* ===== HUB TOPBAR ===== */
-.hub-topbar {
-  position: absolute;
-  top: 0; left: 0; right: 0;
+.global-header {
   height: 52px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  background: rgba(7, 5, 13, 0.92);
+  background: rgba(7, 5, 13, 0.95);
   border-bottom: 1px solid var(--border);
   backdrop-filter: blur(10px);
-  z-index: 10;
+  z-index: 20;
+  position: relative;
+}
+
+.global-content {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+}
+
+.global-footer {
+  height: 72px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 8px;
+  background: rgba(10, 8, 20, 0.98);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  z-index: 20;
+}
+
+/* ===== SCREENS (dentro de .global-content) ===== */
+.screen { display: none; }
+.screen.active {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
 }
 
 .hub-top-brand {
@@ -122,9 +142,7 @@ body {
 /* ===== HUB CENTER ===== */
 .hub-center {
   position: absolute;
-  top: 52px;
-  bottom: 72px;
-  left: 0; right: 0;
+  inset: 0;
   background-image:
     linear-gradient(to bottom, rgba(7,5,13,0.5) 0%, rgba(7,5,13,0.2) 40%, rgba(7,5,13,0.7) 100%),
     url('/assets/hub_bg.png');
@@ -215,9 +233,6 @@ body {
 
 /* ===== BOTÃO FORCE RELOAD (DEV) ===== */
 .btn-force-reload {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   z-index: 20;
   background: rgba(20, 16, 38, 0.7);
   border: 1px solid var(--border);
@@ -235,20 +250,7 @@ body {
 .btn-force-reload:hover { background: rgba(126,87,194,0.3); border-color: var(--purple-light); }
 .btn-force-reload:active { transform: rotate(180deg); }
 
-/* ===== NAVBAR INFERIOR ===== */
-.hub-navbar {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 72px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  padding: 0 8px;
-  background: rgba(10, 8, 20, 0.98);
-  border-top: 1px solid var(--border);
-  backdrop-filter: blur(16px);
-  z-index: 10;
-}
+/* .hub-navbar removido — substituído por .global-footer */
 
 .nav-btn {
   background: none;
@@ -308,19 +310,17 @@ body {
 #combat-screen { background: #050308; }
 
 .combat-header {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 52px;
+  height: 44px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 16px;
   background: rgba(21, 17, 46, 0.95);
   border-bottom: 1px solid var(--border);
   font-family: var(--font-title);
   font-weight: 700;
-  font-size: 1rem;
-  z-index: 10;
+  font-size: 0.9rem;
 }
 
 .btn-back {
@@ -343,25 +343,20 @@ body {
 }
 
 #phaser-container {
-  position: absolute;
-  top: 52px;
-  bottom: 70px;
-  left: 0; right: 0;
-  background: radial-gradient(circle, #100b26 0%, #050308 100%);
+  flex: 1;
   overflow: hidden;
+  background: radial-gradient(circle, #100b26 0%, #050308 100%);
 }
 
-.combat-footer {
-  position: absolute;
-  bottom: 0; left: 0; right: 0;
-  height: 70px;
-  padding: 8px 20px;
+.combat-heroes-strip {
+  height: 48px;
+  flex-shrink: 0;
+  padding: 6px 12px;
   background: rgba(21, 17, 46, 0.95);
   border-top: 1px solid var(--border);
   display: flex;
-  gap: 12px;
+  gap: 10px;
   overflow: hidden;
-  flex-wrap: wrap;
   align-items: center;
 }
 
