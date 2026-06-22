@@ -27,7 +27,12 @@ async function processAlpha(buffer, width, height, tolerance = 45, feather = 25)
     const b = pixels[i + 2];
     const a = pixels[i + 3];
 
-    const dist = Math.abs(r - keyColor.r) + Math.abs(g - keyColor.g) + Math.abs(b - keyColor.b);
+    // Calcula a distância para os três tons de fundo: Magenta, Ciano e Amarelo
+    const distMagenta = Math.abs(r - 255) + Math.abs(g - 0) + Math.abs(b - 255);
+    const distCyan    = Math.abs(r - 0) + Math.abs(g - 255) + Math.abs(b - 255);
+    const distYellow  = Math.abs(r - 255) + Math.abs(g - 255) + Math.abs(b - 0);
+
+    const dist = Math.min(distMagenta, distCyan, distYellow);
 
     if (dist < tolerance) {
       pixels[i + 3] = 0; // Transparente
@@ -69,20 +74,30 @@ export async function compileGeekSprite(inputPath, outputPath, options = {}) {
   const rawPngBuffer = await sharp(inputPath).png().toBuffer();
   const transparentBuffer = await processAlpha(rawPngBuffer, meta.width, meta.height, tolerance, feather);
 
-  // 2. Fatia em 12 frames horizontais
-  const inputCellW = Math.floor(meta.width / TOTAL_FRAMES);
-  const inputCellH = meta.height; // Assume que é uma tira de 1 linha de altura
+  // 2. Fatia em 12 frames
   const frameBuffers = [];
+  const isGrid = meta.width === 1024 && meta.height === 1024;
+  const cellW = isGrid ? 256 : Math.floor(meta.width / TOTAL_FRAMES);
+  const cellH = isGrid ? 256 : meta.height;
 
-  console.log(`[Geek Compiler] Fatiando e centralizando ${TOTAL_FRAMES} frames (célula original: ${inputCellW}x${inputCellH}px)...`);
+  console.log(`[Geek Compiler] Fatiando ${TOTAL_FRAMES} frames (tipo: ${isGrid ? 'Grade 3x4' : 'Tira Linear'}, célula: ${cellW}x${cellH}px)...`);
 
   for (let i = 0; i < TOTAL_FRAMES; i++) {
-    const left = i * inputCellW;
+    let left, top;
+    if (isGrid) {
+      const row = Math.floor(i / 4); // Linha 0 (idle), 1 (walk), 2 (attack)
+      const col = i % 4;             // Frames 0, 1, 2, 3
+      left = col * cellW;
+      top = row * cellH;
+    } else {
+      left = i * cellW;
+      top = 0;
+    }
     
     // Extrai o frame individual
     let frameSharp = sharp(transparentBuffer)
       .clone()
-      .extract({ left, top: 0, width: inputCellW, height: inputCellH });
+      .extract({ left, top, width: cellW, height: cellH });
 
     // Redimensiona o sprite para caber no fitSize mantendo proporções
     // (ex: reduz o sprite para até 38px para caber na moldura de 48px com margem)
