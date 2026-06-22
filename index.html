@@ -11,47 +11,58 @@
 
     <!-- HUB DA CIDADE -->
     <div id="hub-screen" class="screen active">
-      <div class="hub-bg">
-        <div class="hub-title">
-          <h1>⚔️ RELIXIA</h1>
-          <p class="hub-subtitle">Heróis Sem Carteira Assinada</p>
-        </div>
 
-        <div class="resources-bar">
-          <span class="resource">💰 <span id="res-gold">0</span> Ouro</span>
-          <span class="resource">👥 Heróis: <span id="res-heroes">0</span></span>
-          <span class="resource">⚗️ Materiais: <span id="res-mats">0</span></span>
-        </div>
-
-        <div class="hub-buttons">
-          <button class="hub-btn" onclick="openModal('modal-dungeon')">
-            <span class="hub-btn-icon">🌀</span>
-            <span class="hub-btn-label">Portal de Masmorras</span>
-            <span class="hub-btn-desc">Enviar heróis para combate</span>
-          </button>
-          <button class="hub-btn" onclick="openModal('modal-tavern')">
-            <span class="hub-btn-icon">🍺</span>
-            <span class="hub-btn-label">Taverna Multiverso</span>
-            <span class="hub-btn-desc">Recrutar heróis lendários</span>
-          </button>
-          <button class="hub-btn" onclick="openModal('modal-forge')">
-            <span class="hub-btn-icon">🔨</span>
-            <span class="hub-btn-label">Forja Ancestral</span>
-            <span class="hub-btn-desc">Criar equipamentos icônicos</span>
-          </button>
-          <button class="hub-btn" onclick="openModal('modal-sanctuary')">
-            <span class="hub-btn-icon">✨</span>
-            <span class="hub-btn-label">Santuário das Criaturas</span>
-            <span class="hub-btn-desc">Invocar pets lendários</span>
-          </button>
-        </div>
-
-        <div class="guild-status">
-          <span>🏰 Guilda: <strong>Multiverso</strong></span>
-          <span>⚔️ Masmorra: <strong id="active-dungeon-name">Vila da Folha</strong></span>
-          <span>💀 Kills: <strong id="total-kills">0</strong></span>
+      <!-- Recursos no topo -->
+      <div class="hub-topbar">
+        <div class="hub-top-brand">⚔️ RELIXIA</div>
+        <div class="hub-top-resources">
+          <span class="top-res">💰 <strong id="res-gold">0</strong></span>
+          <span class="top-res">👥 <strong id="res-heroes">0</strong></span>
+          <span class="top-res">⚗️ <strong id="res-mats">0</strong></span>
         </div>
       </div>
+
+      <!-- Área central — fundo do hub -->
+      <div class="hub-center">
+        <div class="hub-title-block">
+          <h1 class="hub-main-title">RELIXIA</h1>
+          <p class="hub-main-sub">Heróis Sem Carteira Assinada</p>
+        </div>
+        <div class="hub-status-card">
+          <div class="hub-status-row">
+            <span class="hub-status-label">Masmorra ativa</span>
+            <span class="hub-status-value" id="active-dungeon-name">Vila da Folha</span>
+          </div>
+          <div class="hub-status-row">
+            <span class="hub-status-label">Total de kills</span>
+            <span class="hub-status-value" id="total-kills">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra de menu inferior -->
+      <nav class="hub-navbar">
+        <button class="nav-btn" onclick="openModal('modal-dungeon')">
+          <span class="nav-icon">🌀</span>
+          <span class="nav-label">Masmorras</span>
+        </button>
+        <button class="nav-btn" onclick="openModal('modal-tavern')">
+          <span class="nav-icon">🍺</span>
+          <span class="nav-label">Taverna</span>
+        </button>
+        <button class="nav-btn nav-btn-center" onclick="openModal('modal-dungeon')">
+          <span class="nav-icon-center">⚔️</span>
+        </button>
+        <button class="nav-btn" onclick="openModal('modal-forge')">
+          <span class="nav-icon">🔨</span>
+          <span class="nav-label">Forja</span>
+        </button>
+        <button class="nav-btn" onclick="openModal('modal-sanctuary')">
+          <span class="nav-icon">✨</span>
+          <span class="nav-label">Santuário</span>
+        </button>
+      </nav>
+
     </div>
 
     <!-- TELA DE COMBATE -->

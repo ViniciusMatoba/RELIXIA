@@ -127,22 +127,16 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     // Chão
     const groundLine = this.add.rectangle(W / 2, groundY + 20, W, 40, 0x1a0f30);
 
-    // Heróis ativos da guilda que são desta masmorra
+    // Todos os heróis da dungeon sempre disponíveis para teste
     const heroY = groundY - 24;
-    const activeHeroIds = state.heroes.map(h => h.id);
-    const leafHeroIds   = Object.keys(LEAF_HERO_DATA);
-    const heroesToSpawn = activeHeroIds.length > 0
-      ? activeHeroIds.filter(id => leafHeroIds.includes(id)).slice(0, 4)
-      : leafHeroIds.slice(0, 2);  // default para demo sem guilda
+    const allLeafHeroes = Object.keys(LEAF_HERO_DATA);
 
-    if (heroesToSpawn.length === 0 && dungeonId === 'leaf-village') {
-      heroesToSpawn.push('naruto'); // sempre tem ao menos 1 para demo
-    }
-
-    heroesToSpawn.forEach((id, i) => {
-      const hd = LEAF_HERO_DATA[id] || HEROES.find(h => h.id === id);
+    // Espaçamento horizontal dinâmico para não sobrepor
+    const heroSpacing = Math.min(90, Math.floor((W * 0.45) / allLeafHeroes.length));
+    allLeafHeroes.forEach((id, i) => {
+      const hd = LEAF_HERO_DATA[id];
       if (!hd) return;
-      const x = 60 + i * 80;
+      const x = 50 + i * heroSpacing;
       spawnHero.call(this, hd, x, heroY);
     });
 
@@ -199,9 +193,8 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
           h.cooldown = 1 / (h.data.stats.speed || 1.0);
         }
       } else {
-        // Sem alvo: walk suavemente para a direita até limite
-        const maxX = W * 0.55;
-        if (h.x < maxX) {
+        // Sem alvo: walk até o targetX individual de cada herói
+        if (h.x < h.targetX) {
           h.x += 40 * dt;
           if (h.sprite) { h.sprite.x = h.x; h.sprite.play(`${h.spriteKey}-walk`, true); }
         } else {
@@ -285,6 +278,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       hp: hd.stats.hp,
       maxHp: hd.stats.hp,
       cooldown: 0,
+      targetX: x + 60,   // cada herói avança até seu próprio ponto de parada
     });
   }
 

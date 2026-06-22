@@ -62,196 +62,200 @@ body {
 .screen { display: none; min-height: 100%; flex: 1; }
 .screen.active { display: flex; flex-direction: column; flex: 1; }
 
-/* ===== HUB BG ===== */
-.hub-bg {
-  min-height: 100vh;
-  background-image: linear-gradient(rgba(7, 5, 13, 0.65), rgba(7, 5, 13, 0.85)), url('/assets/hub_bg.png');
+/* ===== HUB TOPBAR ===== */
+.hub-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(7, 5, 13, 0.85);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  flex-shrink: 0;
+}
+
+.hub-top-brand {
+  font-family: var(--font-title);
+  font-weight: 900;
+  font-size: 1rem;
+  letter-spacing: 2px;
+  background: linear-gradient(135deg, var(--gold), var(--purple-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hub-top-resources {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.top-res {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.top-res strong { color: var(--text); }
+#res-gold { color: var(--gold); }
+
+/* ===== HUB CENTER ===== */
+.hub-center {
+  flex: 1;
+  background-image:
+    linear-gradient(to bottom, rgba(7,5,13,0.5) 0%, rgba(7,5,13,0.2) 40%, rgba(7,5,13,0.7) 100%),
+    url('/assets/hub_bg.png');
   background-size: cover;
   background-position: center;
-  background-repeat: no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px 16px 48px;
-  gap: 32px;
+  gap: 20px;
+  padding: 24px 16px;
   position: relative;
   overflow: hidden;
+  min-height: 0;
 }
 
-/* Estrelas de fundo sutis */
-.hub-bg::before {
+/* Estrelas */
+.hub-center::before {
   content: '';
   position: absolute;
   inset: 0;
   background-image:
-    radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 28% 44%, rgba(255,255,255,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 48% 12%, rgba(255,255,255,0.8) 0%, transparent 100%),
-    radial-gradient(2px 2px at 68% 58%, rgba(179,157,219,0.5) 0%, transparent 100%),
-    radial-gradient(1px 1px at 83% 33%, rgba(255,255,255,0.6) 0%, transparent 100%),
-    radial-gradient(1px 1px at 92% 72%, rgba(255,255,255,0.4) 0%, transparent 100%),
-    radial-gradient(1.5px 1.5px at 38% 78%, rgba(255,255,255,0.7) 0%, transparent 100%),
-    radial-gradient(1px 1px at 58% 92%, rgba(179,157,219,0.4) 0%, transparent 100%);
+    radial-gradient(1px 1px at 15% 20%, rgba(255,255,255,0.8) 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 30% 50%, rgba(255,255,255,0.5) 0%, transparent 100%),
+    radial-gradient(1px 1px at 50% 10%, rgba(255,255,255,0.9) 0%, transparent 100%),
+    radial-gradient(2px 2px at 70% 60%, rgba(179,157,219,0.6) 0%, transparent 100%),
+    radial-gradient(1px 1px at 85% 30%, rgba(255,255,255,0.7) 0%, transparent 100%),
+    radial-gradient(1px 1px at 40% 80%, rgba(255,255,255,0.5) 0%, transparent 100%);
   pointer-events: none;
-  opacity: 0.85;
 }
 
-/* ===== TÍTULO (FUTURISTA/ANIME GLOW) ===== */
-.hub-title {
+.hub-title-block {
   text-align: center;
   position: relative;
   z-index: 1;
 }
 
-.hub-title h1 {
+.hub-main-title {
   font-family: var(--font-title);
-  font-size: clamp(2rem, 6vw, 3.4rem);
+  font-size: clamp(2.4rem, 10vw, 3.8rem);
   font-weight: 900;
-  letter-spacing: 3px;
-  background: linear-gradient(135deg, var(--gold) 15%, #ffffff 50%, var(--rare) 85%);
+  letter-spacing: 4px;
+  background: linear-gradient(135deg, var(--gold) 10%, #fff 50%, var(--rare) 90%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  filter: drop-shadow(0 0 15px rgba(255, 202, 40, 0.35));
   animation: titleGlow 4s infinite alternate;
+  line-height: 1;
 }
 
 @keyframes titleGlow {
-  from { filter: drop-shadow(0 0 10px rgba(255, 202, 40, 0.25)); }
-  to { filter: drop-shadow(0 0 25px rgba(126, 87, 194, 0.5)); }
+  from { filter: drop-shadow(0 0 10px rgba(255,202,40,0.3)); }
+  to   { filter: drop-shadow(0 0 28px rgba(126,87,194,0.6)); }
 }
 
-.hub-subtitle {
-  color: var(--text-muted);
+.hub-main-sub {
   font-family: var(--font-title);
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 6px;
+  letter-spacing: 3px;
   text-transform: uppercase;
+  color: var(--text-muted);
   margin-top: 6px;
 }
 
-/* ===== BARRA DE RECURSOS (GLASSMORPHISM) ===== */
-.resources-bar {
-  display: flex;
-  gap: 24px;
-  background: rgba(255, 255, 255, 0.02);
+.hub-status-card {
+  background: rgba(20, 16, 38, 0.7);
   border: 1px solid var(--border);
-  border-radius: 40px;
-  padding: 12px 32px;
+  border-radius: 16px;
+  padding: 14px 20px;
+  backdrop-filter: blur(12px);
+  width: 100%;
+  max-width: 320px;
   position: relative;
   z-index: 1;
-  flex-wrap: wrap;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 10px 30px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
-.resource {
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--text-muted);
+.hub-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+}
+
+.hub-status-label { color: var(--text-muted); }
+.hub-status-value { color: var(--gold); font-weight: 700; font-family: var(--font-title); }
+
+/* ===== NAVBAR INFERIOR ===== */
+.hub-navbar {
   display: flex;
   align-items: center;
-  gap: 6px;
-}
-
-.resource span {
-  color: #fff;
-  font-weight: 700;
-  text-shadow: 0 0 8px rgba(255,255,255,0.25);
-}
-
-#res-gold { color: var(--gold); }
-
-/* ===== BOTÕES PRINCIPAIS ===== */
-.hub-buttons {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-  width: 100%;
-  max-width: 640px;
+  justify-content: space-around;
+  padding: 0 8px;
+  height: 68px;
+  background: rgba(10, 8, 20, 0.95);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(16px);
+  flex-shrink: 0;
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
-.hub-btn {
-  background: linear-gradient(135deg, rgba(30, 24, 56, 0.7), rgba(15, 12, 30, 0.8));
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  padding: 24px 20px;
-  cursor: pointer;
-  color: var(--text);
+.nav-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  gap: 4px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  flex: 1;
+}
+
+.nav-btn:hover, .nav-btn:active {
+  color: var(--purple-light);
+  background: rgba(126, 87, 194, 0.12);
+}
+
+.nav-icon { font-size: 1.5rem; line-height: 1; }
+.nav-label { font-size: 0.62rem; font-family: var(--font-title); font-weight: 700; letter-spacing: 0.5px; }
+
+/* Botão central em destaque */
+.nav-btn-center {
   position: relative;
-  overflow: hidden;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  flex: 0 0 64px;
+  padding: 0;
 }
 
-.hub-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--purple) 0%, transparent 100%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.hub-btn:hover {
-  border-color: var(--purple-light);
-  transform: translateY(-4px);
-  box-shadow: 0 12px 36px rgba(126, 87, 194, 0.45);
-}
-
-.hub-btn:hover::before { opacity: 0.25; }
-.hub-btn:active { transform: translateY(-1px); }
-
-.hub-btn-icon {
-  font-size: 2.6rem;
-  line-height: 1;
-  position: relative;
-  z-index: 1;
-  filter: drop-shadow(0 0 8px rgba(255,255,255,0.1));
-}
-
-.hub-btn-label {
-  font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 1.05rem;
-  position: relative;
-  z-index: 1;
-  text-align: center;
-}
-
-.hub-btn-desc {
-  font-size: 0.76rem;
-  color: var(--text-muted);
-  position: relative;
-  z-index: 1;
-  text-align: center;
-}
-
-/* ===== STATUS DA GUILDA ===== */
-.guild-status {
+.nav-icon-center {
+  width: 56px;
+  height: 56px;
+  background: linear-gradient(135deg, var(--purple) 0%, var(--purple-light) 100%);
+  border-radius: 50%;
   display: flex;
-  gap: 24px;
-  font-size: 0.88rem;
-  color: var(--text-muted);
-  flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 1;
+  font-size: 1.6rem;
+  box-shadow: 0 0 20px rgba(126, 87, 194, 0.6);
+  border: 2px solid rgba(179, 157, 219, 0.4);
+  margin-top: -20px;
+  transition: all 0.2s ease;
 }
 
-.guild-status strong {
-  color: var(--text);
-  font-weight: 600;
+.nav-btn-center:hover .nav-icon-center {
+  transform: scale(1.08);
+  box-shadow: 0 0 32px rgba(126, 87, 194, 0.9);
 }
 
 #active-dungeon-name {
