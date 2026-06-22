@@ -47,29 +47,28 @@ export function startCombat(dungeonId) {
 
   if (game) { game.destroy(true); game = null; }
 
-  // Double-RAF: garante que o layout terminou antes de ler as dimensões
-  requestAnimationFrame(() => {
-    requestAnimationFrame(() => {
-      const container = document.getElementById('phaser-container');
-      const appEl = document.getElementById('app');
-      // Usa dimensões reais do container, com fallback pelo app/window
-      const W = container.offsetWidth  || appEl.offsetWidth  || Math.min(window.innerWidth, 480);
-      const H = container.offsetHeight || appEl.offsetHeight - 122 || window.innerHeight - 122;
+  const sprites = DUNGEON_SPRITES[dungeonId];
 
-      const sprites = DUNGEON_SPRITES[dungeonId];
+  // Dimensões fixas de design — Scale Manager ajusta para caber no container
+  const W = 480;
+  const H = Math.max(window.innerHeight - 122, 350);
 
-      game = new Phaser.Game({
-        type: Phaser.AUTO,
-        width: W,
-        height: H,
-        backgroundColor: '#1a0f30',
-        parent: 'phaser-container',
-        physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
-        render: { preserveDrawingBuffer: true, antialias: false },
-        scale: { mode: Phaser.Scale.NONE },
-        scene: buildScene(dungeonId, dungeon, sprites, W, H),
-      });
-    });
+  game = new Phaser.Game({
+    type: Phaser.AUTO,
+    width: W,
+    height: H,
+    backgroundColor: '#1a0f30',
+    parent: 'phaser-container',
+    physics: { default: 'arcade', arcade: { gravity: { y: 0 }, debug: false } },
+    render: { preserveDrawingBuffer: true, antialias: false },
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH,
+      parent: 'phaser-container',
+      width: W,
+      height: H,
+    },
+    scene: buildScene(dungeonId, dungeon, sprites, W, H),
   });
 }
 
