@@ -70,30 +70,20 @@ body {
 }
 
 /* ===== SCREENS ===== */
+/* Todas as telas ficam empilhadas dentro de #app (position:relative) */
 .screen { display: none; }
-
-/* Outras telas: flex coluna normal */
 .screen.active {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  min-height: 0;
-  overflow: hidden;
-}
-
-/* Hub: grid com linhas absolutas — topbar fixa | centro expansível | navbar fixa */
-#hub-screen.active {
-  display: grid;
-  grid-template-rows: 52px 1fr 72px;
-  grid-template-columns: 1fr;
-  flex: 1;
-  min-height: 0;
+  display: block;
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
   overflow: hidden;
 }
 
 /* ===== HUB TOPBAR ===== */
 .hub-topbar {
-  grid-row: 1;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -131,7 +121,10 @@ body {
 
 /* ===== HUB CENTER ===== */
 .hub-center {
-  grid-row: 2;
+  position: absolute;
+  top: 52px;
+  bottom: 72px;
+  left: 0; right: 0;
   background-image:
     linear-gradient(to bottom, rgba(7,5,13,0.5) 0%, rgba(7,5,13,0.2) 40%, rgba(7,5,13,0.7) 100%),
     url('/assets/hub_bg.png');
@@ -143,9 +136,7 @@ body {
   justify-content: center;
   gap: 20px;
   padding: 24px 16px;
-  position: relative;
   overflow: hidden;
-  min-height: 0;
 }
 
 /* Estrelas */
@@ -246,12 +237,13 @@ body {
 
 /* ===== NAVBAR INFERIOR ===== */
 .hub-navbar {
-  grid-row: 3;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: space-around;
-  padding: 0 8px env(safe-area-inset-bottom, 0px);
-  height: 72px;
+  padding: 0 8px;
   background: rgba(10, 8, 20, 0.98);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(16px);
@@ -313,17 +305,12 @@ body {
 }
 
 /* ===== TELA DE COMBATE ===== */
-#combat-screen {
-  background: #050308;
-  display: grid;
-  grid-template-rows: 52px 1fr 70px;
-  grid-template-columns: 1fr;
-  flex: 1;
-  min-height: 0;
-}
+#combat-screen { background: #050308; }
 
 .combat-header {
-  grid-row: 1;
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 52px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -333,6 +320,7 @@ body {
   font-family: var(--font-title);
   font-weight: 700;
   font-size: 1rem;
+  z-index: 10;
 }
 
 .btn-back {
@@ -355,22 +343,18 @@ body {
 }
 
 #phaser-container {
-  grid-row: 2;
-  display: flex;
-  align-items: stretch;
-  justify-content: stretch;
+  position: absolute;
+  top: 52px;
+  bottom: 70px;
+  left: 0; right: 0;
   background: radial-gradient(circle, #100b26 0%, #050308 100%);
   overflow: hidden;
 }
 
-#phaser-container canvas {
-  width: 100% !important;
-  height: 100% !important;
-  display: block;
-}
-
 .combat-footer {
-  grid-row: 3;
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 70px;
   padding: 8px 20px;
   background: rgba(21, 17, 46, 0.95);
   border-top: 1px solid var(--border);
