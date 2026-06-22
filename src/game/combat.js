@@ -24,7 +24,7 @@ const DUNGEON_SPRITES = {
 
 // ─── Fallback: rect colorido quando não há sprite ────────────────────────────
 const HERO_COLORS   = { naruto: 0xff8c00, sasuke: 0x4499ff, sakura: 0xff6b9d };
-const ENEMY_COLORS  = { nukenin: 0x444466, zabuza: 0x880000 };
+const ENEMY_COLORS  = { nukenin: 0xff2222, zabuza: 0xff0000 };
 
 // ─── Dados dos heróis desta fase ─────────────────────────────────────────────
 const LEAF_HERO_DATA = {
@@ -199,7 +199,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     // Spawn
     spawnTimer -= dt;
     if (spawnTimer <= 0) {
-      spawnEnemy.call(this, W);
+      try { spawnEnemy.call(this, W); } catch(err) { console.error('[spawnEnemy]', err); }
       spawnTimer = Math.max(0.8, 2.5 - killCount * 0.015);
     }
 
@@ -209,7 +209,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
       e.x -= e.speed * delta;
       if (e.sprite) {
         e.sprite.x = e.x;
-        if (e.sprite.setFlipX) e.sprite.setFlipX(false);
+        if (e.sprite.setFlipX) e.sprite.setFlipX(true);
       }
       if (e.nameTag) e.nameTag.x = e.x;
       updateEntityHP(e);
@@ -303,7 +303,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setFlipX(true).setDepth(5);
+        sprite = this.add.sprite(x, y, spriteKey).setOrigin(0.5, 1).setScale(scale).setFlipX(false).setDepth(5);
         try { sprite.play(`${spriteKey}-idle`); } catch(e) { console.warn('anim idle falhou', spriteKey, e); }
       } catch (_) { sprite = null; }
     }
@@ -351,7 +351,7 @@ function buildScene(dungeonId, dungeon, spriteConfig, W, H) {
     let sprite = null;
     if (hasAnim) {
       try {
-        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(false).setDepth(5);
+        sprite = this.add.sprite(x, ey, enemyKey).setOrigin(0.5, 1).setScale(enemyScale).setFlipX(true).setDepth(5);
         try { sprite.play(`${enemyKey}-walk`); } catch(e) { console.warn('anim walk falhou', enemyKey, e); }
       } catch (_) { sprite = null; }
     }
